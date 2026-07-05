@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# uploaded tenant logos (use real object storage — S3/Cloudinary — in production)
+/public/uploads/logos/*
+!/public/uploads/logos/.gitkeep
