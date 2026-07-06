@@ -9,12 +9,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const session = await auth();
   const user = session?.user;
 
-  if (!user || user.isSuperAdmin || !user.clientId || !user.role || !user.clientBusinessType) {
+  if (!user || user.isSuperAdmin || !user.clientId || !user.role) {
     redirect("/login");
   }
 
   const clientName = user.clientName ?? "Business Manager";
-  const businessType = user.clientBusinessType;
+  // Sessions signed before this field existed won't have it in their JWT yet
+  // (JWT sessions aren't re-fetched from the DB until re-login) — fall back
+  // rather than forcing every logged-in user to re-authenticate.
+  const businessType = user.clientBusinessType ?? "RESTAURANT";
 
   return (
     <div className="flex flex-1 min-h-screen">
