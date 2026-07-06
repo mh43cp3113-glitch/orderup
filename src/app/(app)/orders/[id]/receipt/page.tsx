@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireCurrentClientId } from "@/lib/current-client";
 import { formatCurrency, formatDateTime } from "@/lib/format";
-import { PrintButton } from "./print-button";
+import { WhatsappReceiptButton } from "./whatsapp-receipt-button";
 
 export default async function ReceiptPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -11,6 +11,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
   const order = await prisma.order.findFirst({
     where: { id, clientId },
     include: {
+      client: { select: { name: true } },
       table: true,
       customer: true,
       bill: true,
@@ -23,10 +24,33 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
 
   const totalPaid = order.payments.reduce((sum, p) => sum + Number(p.amount), 0);
 
+  const receiptMessage = [
+    order.client.name,
+    "Tax Invoice / Receipt",
+    `Order: ${order.orderNumber} · ${formatDateTime(order.createdAt)}`,
+    "",
+    ...order.items.map(
+      (item) =>
+        `${item.menuItem.name}${item.variant ? ` (${item.variant.name})` : ""} x${item.quantity} - ${formatCurrency(item.totalPrice.toString())}`,
+    ),
+    "",
+    `Subtotal: ${formatCurrency(order.subtotal.toString())}`,
+    `Tax (GST): ${formatCurrency(order.taxAmount.toString())}`,
+    ...(Number(order.discountAmount) > 0
+      ? [`Discount: -${formatCurrency(order.discountAmount.toString())}`]
+      : []),
+    `Total: ${formatCurrency(order.totalAmount.toString())}`,
+    `Paid: ${formatCurrency(totalPaid)}`,
+    "",
+    "Thank you, visit again!",
+  ].join("\n");
+
   return (
     <div className="max-w-md mx-auto flex flex-col gap-4 print:max-w-full">
-      <div className="print:hidden">
-        <PrintButton />
+      <div className="print:hidden flex gap-2">
+        {order.customer?.phone && (
+          <WhatsappReceiptButton phone={order.customer.phone} message={receiptMessage} />
+        )}
       </div>
       <div className="rounded-lg border bg-background p-6 font-mono text-sm">
         <div className="text-center mb-4">
