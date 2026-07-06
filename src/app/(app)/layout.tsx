@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { NavSidebar } from "@/components/nav-sidebar";
 import { UserMenu } from "@/components/user-menu";
 import { ClientBranding } from "@/components/client-branding";
+import { MobileNav } from "@/components/mobile-nav";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -24,7 +25,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </aside>
       <div className="flex flex-1 flex-col min-w-0">
         <header className="flex items-center justify-between border-b bg-background px-4 py-3">
-          <div className="md:hidden">
+          <div className="flex items-center gap-2 md:hidden">
+            <MobileNav
+              role={user.role}
+              clientName={clientName}
+              clientLogoUrl={user.clientLogoUrl}
+            />
             <ClientBranding name={clientName} logoUrl={user.clientLogoUrl} className="text-sm" />
           </div>
           <div className="ml-auto">

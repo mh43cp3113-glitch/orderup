@@ -66,7 +66,7 @@ const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-export function NavSidebar({ role }: { role: Role }) {
+export function NavSidebar({ role, onNavigate }: { role: Role; onNavigate?: () => void }) {
   const pathname = usePathname();
   const items = NAV_ITEMS.filter((item) => item.roles.includes(role));
 
@@ -79,6 +79,7 @@ export function NavSidebar({ role }: { role: Role }) {
           <Link
             key={item.href}
             href={item.href}
+            onClick={onNavigate}
             className={cn(
               "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
               active
