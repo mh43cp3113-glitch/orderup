@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Trash2 } from "lucide-react";
 import { createMenuItem, updateMenuItem } from "./actions";
+import { isBakeryVertical } from "@/lib/vertical";
+import type { BusinessType, WeightUnit } from "@/generated/prisma/enums";
 
 type Category = { id: string; name: string };
 type Variant = { name: string; price: number };
@@ -32,15 +34,21 @@ type MenuItemInput = {
   categoryId: string;
   costPrice: string;
   isSeasonal: boolean;
+  weightValue: string | null;
+  weightUnit: WeightUnit | null;
+  flavor: string | null;
+  isEggless: boolean;
   variants: Variant[];
 };
 
 export function ItemDialog({
   categories,
   item,
+  businessType,
 }: {
   categories: Category[];
   item?: MenuItemInput;
+  businessType: BusinessType;
 }) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string>();
@@ -175,6 +183,53 @@ export function ItemDialog({
               </div>
             ))}
           </div>
+
+          {isBakeryVertical(businessType) && (
+            <div className="flex flex-col gap-4 rounded-md border p-3">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="weightValue">Weight</Label>
+                  <Input
+                    id="weightValue"
+                    name="weightValue"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    defaultValue={item?.weightValue ?? ""}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="weightUnit">Unit</Label>
+                  <Select
+                    name="weightUnit"
+                    defaultValue={item?.weightUnit ?? "KILOGRAM"}
+                    items={{ GRAM: "g", KILOGRAM: "kg" }}
+                  >
+                    <SelectTrigger id="weightUnit">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="GRAM">g</SelectItem>
+                      <SelectItem value="KILOGRAM">kg</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="flavor">Flavor</Label>
+                <Input
+                  id="flavor"
+                  name="flavor"
+                  placeholder="e.g. Chocolate Truffle"
+                  defaultValue={item?.flavor ?? ""}
+                />
+              </div>
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" name="isEggless" defaultChecked={item?.isEggless} />
+                Eggless
+              </label>
+            </div>
+          )}
 
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" name="isSeasonal" defaultChecked={item?.isSeasonal} />

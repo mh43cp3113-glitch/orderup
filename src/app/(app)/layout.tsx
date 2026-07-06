@@ -9,11 +9,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const session = await auth();
   const user = session?.user;
 
-  if (!user || user.isSuperAdmin || !user.clientId || !user.role) {
+  if (!user || user.isSuperAdmin || !user.clientId || !user.role || !user.clientBusinessType) {
     redirect("/login");
   }
 
   const clientName = user.clientName ?? "Business Manager";
+  const businessType = user.clientBusinessType;
 
   return (
     <div className="flex flex-1 min-h-screen">
@@ -21,13 +22,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="px-4 py-4 border-b">
           <ClientBranding name={clientName} logoUrl={user.clientLogoUrl} />
         </div>
-        <NavSidebar role={user.role} />
+        <NavSidebar role={user.role} businessType={businessType} />
       </aside>
       <div className="flex flex-1 flex-col min-w-0">
         <header className="flex items-center justify-between border-b bg-background px-4 py-3">
           <div className="flex items-center gap-2 md:hidden">
             <MobileNav
               role={user.role}
+              businessType={businessType}
               clientName={clientName}
               clientLogoUrl={user.clientLogoUrl}
             />

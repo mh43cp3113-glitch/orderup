@@ -12,11 +12,12 @@ import {
   Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Role } from "@/generated/prisma/enums";
+import type { Role, BusinessType } from "@/generated/prisma/enums";
+import { ordersLabel, tablesLabel } from "@/lib/vertical";
 
 type NavItem = {
   href: string;
-  label: string;
+  label: string | ((businessType: BusinessType) => string);
   icon: React.ComponentType<{ className?: string }>;
   roles: Role[];
 };
@@ -30,13 +31,13 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: "/orders",
-    label: "Orders",
+    label: ordersLabel,
     icon: ClipboardList,
     roles: ["ADMIN", "MANAGER", "CASHIER", "WAITER", "CHEF"],
   },
   {
     href: "/tables",
-    label: "Tables",
+    label: tablesLabel,
     icon: Grid3x3,
     roles: ["ADMIN", "MANAGER", "WAITER", "CASHIER"],
   },
@@ -66,7 +67,15 @@ const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-export function NavSidebar({ role, onNavigate }: { role: Role; onNavigate?: () => void }) {
+export function NavSidebar({
+  role,
+  businessType,
+  onNavigate,
+}: {
+  role: Role;
+  businessType: BusinessType;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
   const items = NAV_ITEMS.filter((item) => item.roles.includes(role));
 
@@ -75,6 +84,7 @@ export function NavSidebar({ role, onNavigate }: { role: Role; onNavigate?: () =
       {items.map((item) => {
         const active = pathname.startsWith(item.href);
         const Icon = item.icon;
+        const label = typeof item.label === "function" ? item.label(businessType) : item.label;
         return (
           <Link
             key={item.href}
@@ -88,7 +98,7 @@ export function NavSidebar({ role, onNavigate }: { role: Role; onNavigate?: () =
             )}
           >
             <Icon className="h-4 w-4" />
-            {item.label}
+            {label}
           </Link>
         );
       })}

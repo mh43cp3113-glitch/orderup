@@ -24,6 +24,7 @@ export function CheckoutPanel({
   totalAmount,
   totalPaid,
   hasBill,
+  gstEnabled,
 }: {
   orderId: string;
   subtotal: string;
@@ -32,6 +33,7 @@ export function CheckoutPanel({
   totalAmount: string;
   totalPaid: number;
   hasBill: boolean;
+  gstEnabled: boolean;
 }) {
   const action = recordPayment.bind(null, orderId);
   const [error, formAction, isPending] = useActionState(action, undefined);
@@ -46,10 +48,12 @@ export function CheckoutPanel({
           <span className="text-muted-foreground">Subtotal</span>
           <span>{formatCurrency(subtotal)}</span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Tax (GST)</span>
-          <span>{formatCurrency(taxAmount)}</span>
-        </div>
+        {gstEnabled && (
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Tax (GST)</span>
+            <span>{formatCurrency(taxAmount)}</span>
+          </div>
+        )}
         {Number(discountAmount) > 0 && (
           <div className="flex justify-between text-green-600">
             <span>Discount</span>

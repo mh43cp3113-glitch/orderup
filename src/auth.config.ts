@@ -1,5 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
-import type { Role } from "@/generated/prisma/enums";
+import type { Role, BusinessType } from "@/generated/prisma/enums";
 
 export const authConfig = {
   session: { strategy: "jwt" },
@@ -42,6 +42,7 @@ export const authConfig = {
           clientId: string | null;
           clientName: string | null;
           clientLogoUrl: string | null;
+          clientBusinessType: BusinessType | null;
         };
         token.id = u.id;
         token.role = u.role;
@@ -49,6 +50,7 @@ export const authConfig = {
         token.clientId = u.clientId;
         token.clientName = u.clientName;
         token.clientLogoUrl = u.clientLogoUrl;
+        token.clientBusinessType = u.clientBusinessType;
       }
       return token;
     },
@@ -60,6 +62,7 @@ export const authConfig = {
         session.user.clientId = token.clientId as string | null;
         session.user.clientName = token.clientName as string | null;
         session.user.clientLogoUrl = token.clientLogoUrl as string | null;
+        session.user.clientBusinessType = token.clientBusinessType as BusinessType | null;
       }
       return session;
     },

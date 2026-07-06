@@ -14,7 +14,7 @@ import {
 import { Plus } from "lucide-react";
 import { createTable } from "./actions";
 
-export function AddTableDialog() {
+export function AddTableDialog({ label }: { label: string }) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string>();
   const [isPending, startTransition] = useTransition();
@@ -36,17 +36,17 @@ export function AddTableDialog() {
       <DialogTrigger
         render={
           <Button size="sm">
-            <Plus className="h-4 w-4" /> Add Table
+            <Plus className="h-4 w-4" /> Add {label}
           </Button>
         }
       />
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Table</DialogTitle>
+          <DialogTitle>Add {label}</DialogTitle>
         </DialogHeader>
         <form action={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="name">Table name</Label>
+            <Label htmlFor="name">{label} name</Label>
             <Input id="name" name="name" required placeholder="e.g. T7" />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -61,7 +61,7 @@ export function AddTableDialog() {
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" disabled={isPending}>
-            {isPending ? "Saving..." : "Add table"}
+            {isPending ? "Saving..." : `Add ${label.toLowerCase()}`}
           </Button>
         </form>
       </DialogContent>

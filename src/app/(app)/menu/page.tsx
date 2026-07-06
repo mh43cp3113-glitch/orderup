@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { requireCurrentClientId } from "@/lib/current-client";
+import { requireCurrentClientContext } from "@/lib/current-client";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/format";
@@ -8,7 +8,7 @@ import { ItemDialog } from "./item-dialog";
 import { AvailabilityToggle, DeleteItemButton } from "./item-row-actions";
 
 export default async function MenuPage() {
-  const clientId = await requireCurrentClientId();
+  const { clientId, businessType } = await requireCurrentClientContext();
   const categories = await prisma.menuCategory.findMany({
     where: { clientId },
     orderBy: { sortOrder: "asc" },
@@ -33,7 +33,7 @@ export default async function MenuPage() {
         </div>
         <div className="flex gap-2">
           <CategoryDialog />
-          <ItemDialog categories={categoryOptions} />
+          <ItemDialog categories={categoryOptions} businessType={businessType} />
         </div>
       </div>
 
@@ -63,6 +63,13 @@ export default async function MenuPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-medium">{item.name}</p>
+                        {item.weightValue && (
+                          <Badge variant="outline">
+                            {item.weightValue.toString()} {item.weightUnit === "GRAM" ? "g" : "kg"}
+                          </Badge>
+                        )}
+                        {item.flavor && <Badge variant="outline">{item.flavor}</Badge>}
+                        {item.isEggless && <Badge variant="outline">Eggless</Badge>}
                         {item.isSeasonal && <Badge variant="secondary">Seasonal</Badge>}
                         {!item.isAvailable && <Badge variant="destructive">Unavailable</Badge>}
                       </div>
@@ -83,6 +90,7 @@ export default async function MenuPage() {
                       <AvailabilityToggle itemId={item.id} isAvailable={item.isAvailable} />
                       <ItemDialog
                         categories={categoryOptions}
+                        businessType={businessType}
                         item={{
                           id: item.id,
                           name: item.name,
@@ -90,6 +98,10 @@ export default async function MenuPage() {
                           categoryId: item.categoryId,
                           costPrice: item.costPrice.toString(),
                           isSeasonal: item.isSeasonal,
+                          weightValue: item.weightValue?.toString() ?? null,
+                          weightUnit: item.weightUnit,
+                          flavor: item.flavor,
+                          isEggless: item.isEggless,
                           variants: item.variants.map((v) => ({
                             name: v.name,
                             price: Number(v.price),

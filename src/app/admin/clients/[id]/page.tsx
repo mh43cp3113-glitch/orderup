@@ -41,6 +41,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
               name={client.name}
               businessType={client.businessType}
               billingCycle={client.billingCycle}
+              gstEnabled={client.gstEnabled}
             />
           </CardContent>
         </Card>

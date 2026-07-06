@@ -109,6 +109,7 @@ export async function updateClient(clientId: string, formData: FormData) {
   const name = (formData.get("name") as string)?.trim();
   const businessType = formData.get("businessType") as BusinessType;
   const billingCycle = formData.get("billingCycle") as BillingCycle;
+  const gstEnabled = formData.get("gstEnabled") === "on";
   if (!name || !businessType || !billingCycle) {
     return "Name, business type and billing plan are required";
   }
@@ -127,7 +128,7 @@ export async function updateClient(clientId: string, formData: FormData) {
 
   await prisma.client.update({
     where: { id: clientId },
-    data: { name, businessType, billingCycle, logoUrl },
+    data: { name, businessType, billingCycle, logoUrl, gstEnabled },
   });
 
   revalidatePath("/admin/clients");

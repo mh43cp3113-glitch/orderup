@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatDate } from "@/lib/format";
+import { orderLabelSingular, tableLabelSingular } from "@/lib/vertical";
 import { OrderStatusBadge, OrderSourceBadge } from "../status-badge";
 import { StatusControls } from "./status-controls";
 import { AddItemForm } from "./add-item-form";
@@ -24,6 +25,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const order = await prisma.order.findFirst({
     where: { id, clientId },
     include: {
+      client: { select: { businessType: true, gstEnabled: true } },
       table: true,
       customer: true,
       waiter: true,
@@ -61,17 +63,27 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     ["ADMIN", "MANAGER", "CASHIER"].includes(role);
 
   const totalPaid = order.payments.reduce((sum, p) => sum + Number(p.amount), 0);
+  const label = orderLabelSingular(order.client.businessType);
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Order {order.orderNumber}</h1>
+          <h1 className="text-2xl font-semibold">
+            {label} {order.orderNumber}
+          </h1>
           <p className="text-sm text-muted-foreground">
             {order.type.replace("_", " ")} &middot; {order.table?.name ?? order.customer?.name ?? "Walk-in"}
             {" "}&middot; Placed {formatDateTime(order.createdAt)}
             {order.waiter && <> &middot; Waiter: {order.waiter.name}</>}
           </p>
+          {(order.checkInDate || order.checkOutDate || order.guestCount) && (
+            <p className="text-sm text-muted-foreground">
+              {order.checkInDate && <>Check-in {formatDate(order.checkInDate)}</>}
+              {order.checkOutDate && <> &middot; Check-out {formatDate(order.checkOutDate)}</>}
+              {order.guestCount && <> &middot; {order.guestCount} guests</>}
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <OrderStatusBadge status={order.status} />
@@ -93,7 +105,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       <div className="grid lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Order items</CardTitle>
+            <CardTitle>{label} items</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
@@ -180,6 +192,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                   totalAmount={order.totalAmount.toString()}
                   totalPaid={totalPaid}
                   hasBill={Boolean(order.bill)}
+                  gstEnabled={order.client.gstEnabled}
                 />
               </CardContent>
             </Card>

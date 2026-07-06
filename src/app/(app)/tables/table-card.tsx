@@ -27,8 +27,12 @@ const STATUS_OPTIONS: TableStatus[] = ["AVAILABLE", "OCCUPIED", "RESERVED", "CLE
 
 export function TableCard({
   table,
+  label,
+  orderLabel,
 }: {
   table: { id: string; name: string; floor: string; capacity: number; status: TableStatus; activeOrderId?: string };
+  label: string;
+  orderLabel: string;
 }) {
   const [isPending, startTransition] = useTransition();
 
@@ -43,7 +47,7 @@ export function TableCard({
       try {
         await deleteTable(table.id);
       } catch {
-        toast.error("Cannot delete a table with existing orders");
+        toast.error(`Cannot delete a ${label.toLowerCase()} with existing ${orderLabel.toLowerCase()}s`);
       }
     });
   }
@@ -68,7 +72,7 @@ export function TableCard({
                 </DropdownMenuItem>
               ))}
               <DropdownMenuItem variant="destructive" onClick={handleDelete}>
-                Delete table
+                Delete {label.toLowerCase()}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -77,7 +81,7 @@ export function TableCard({
       <CardContent className="flex flex-col gap-2">
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
-            <Users className="h-3.5 w-3.5" /> {table.capacity} seats
+            <Users className="h-3.5 w-3.5" /> {table.capacity} {label === "Room" ? "guests" : "seats"}
           </span>
           <Badge variant="outline" className="capitalize">
             {table.status.toLowerCase()}
@@ -88,7 +92,7 @@ export function TableCard({
             size="sm"
             className="w-full"
             nativeButton={false}
-            render={<Link href={`/orders/new?tableId=${table.id}`}>Start Order</Link>}
+            render={<Link href={`/orders/new?tableId=${table.id}`}>Start {orderLabel}</Link>}
           />
         )}
         {table.status === "OCCUPIED" && table.activeOrderId && (
@@ -97,7 +101,7 @@ export function TableCard({
             variant="outline"
             className="w-full"
             nativeButton={false}
-            render={<Link href={`/orders/${table.activeOrderId}`}>View Order</Link>}
+            render={<Link href={`/orders/${table.activeOrderId}`}>View {orderLabel}</Link>}
           />
         )}
       </CardContent>

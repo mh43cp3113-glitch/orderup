@@ -21,11 +21,13 @@ export function EditClientForm({
   name,
   businessType,
   billingCycle,
+  gstEnabled,
 }: {
   clientId: string;
   name: string;
   businessType: BusinessType;
   billingCycle: BillingCycle;
+  gstEnabled: boolean;
 }) {
   const [error, setError] = useState<string>();
   const [isPending, startTransition] = useTransition();
@@ -77,6 +79,10 @@ export function EditClientForm({
         <Label htmlFor="logo">Replace logo</Label>
         <Input id="logo" name="logo" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" />
       </div>
+      <label className="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="gstEnabled" defaultChecked={gstEnabled} />
+        GST enabled
+      </label>
       {error && <p className="text-sm text-destructive">{error}</p>}
       <Button type="submit" disabled={isPending} className="self-start">
         {isPending ? "Saving..." : "Save changes"}

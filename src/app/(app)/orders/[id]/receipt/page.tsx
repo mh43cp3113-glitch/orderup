@@ -11,7 +11,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
   const order = await prisma.order.findFirst({
     where: { id, clientId },
     include: {
-      client: { select: { name: true } },
+      client: { select: { name: true, gstEnabled: true } },
       table: true,
       customer: true,
       bill: true,
@@ -35,7 +35,9 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
     ),
     "",
     `Subtotal: ${formatCurrency(order.subtotal.toString())}`,
-    `Tax (GST): ${formatCurrency(order.taxAmount.toString())}`,
+    ...(order.client.gstEnabled
+      ? [`Tax (GST): ${formatCurrency(order.taxAmount.toString())}`]
+      : []),
     ...(Number(order.discountAmount) > 0
       ? [`Discount: -${formatCurrency(order.discountAmount.toString())}`]
       : []),
@@ -97,10 +99,12 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
             <span>Subtotal</span>
             <span>{formatCurrency(order.subtotal.toString())}</span>
           </div>
-          <div className="flex justify-between">
-            <span>Tax (GST)</span>
-            <span>{formatCurrency(order.taxAmount.toString())}</span>
-          </div>
+          {order.client.gstEnabled && (
+            <div className="flex justify-between">
+              <span>Tax (GST)</span>
+              <span>{formatCurrency(order.taxAmount.toString())}</span>
+            </div>
+          )}
           {Number(order.discountAmount) > 0 && (
             <div className="flex justify-between">
               <span>Discount{order.bill?.couponCode ? ` (${order.bill.couponCode})` : ""}</span>

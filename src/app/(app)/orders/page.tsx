@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { requireCurrentClientId } from "@/lib/current-client";
+import { requireCurrentClientContext } from "@/lib/current-client";
+import { ordersLabel, orderLabelSingular, tableLabelSingular } from "@/lib/vertical";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,7 +10,7 @@ import { OrderStatusBadge, OrderSourceBadge } from "./status-badge";
 import { Plus } from "lucide-react";
 
 export default async function OrdersPage() {
-  const clientId = await requireCurrentClientId();
+  const { clientId, businessType } = await requireCurrentClientContext();
   const orders = await prisma.order.findMany({
     where: { clientId },
     orderBy: { createdAt: "desc" },
@@ -17,20 +18,23 @@ export default async function OrdersPage() {
     include: { table: true, customer: true, items: true },
   });
 
+  const label = ordersLabel(businessType);
+  const tableLabel = tableLabelSingular(businessType);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Orders</h1>
+          <h1 className="text-2xl font-semibold">{label}</h1>
           <p className="text-sm text-muted-foreground">
-            Dine-in, takeaway and delivery orders across the restaurant.
+            All {label.toLowerCase()} across the business.
           </p>
         </div>
         <Button
           nativeButton={false}
           render={
             <Link href="/orders/new">
-              <Plus className="h-4 w-4" /> New Order
+              <Plus className="h-4 w-4" /> New {orderLabelSingular(businessType)}
             </Link>
           }
         />
@@ -41,9 +45,9 @@ export default async function OrdersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Order #</TableHead>
+                <TableHead>{orderLabelSingular(businessType)} #</TableHead>
                 <TableHead>Type</TableHead>
-                <TableHead>Table / Customer</TableHead>
+                <TableHead>{tableLabel} / Customer</TableHead>
                 <TableHead>Items</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead>Status</TableHead>
@@ -76,7 +80,7 @@ export default async function OrdersPage() {
               {orders.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                    No orders yet.
+                    No {label.toLowerCase()} yet.
                   </TableCell>
                 </TableRow>
               )}

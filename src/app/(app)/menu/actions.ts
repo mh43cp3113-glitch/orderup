@@ -16,6 +16,10 @@ const menuItemSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   costPrice: z.coerce.number().min(0).default(0),
   isSeasonal: z.coerce.boolean().default(false),
+  weightValue: z.coerce.number().positive().optional(),
+  weightUnit: z.enum(["GRAM", "KILOGRAM"]).optional(),
+  flavor: z.string().optional(),
+  isEggless: z.coerce.boolean().default(false),
   variants: z.array(variantSchema).min(1, "At least one price variant is required"),
 });
 
@@ -44,6 +48,10 @@ export async function createMenuItem(_prev: string | undefined, formData: FormDa
     categoryId: formData.get("categoryId"),
     costPrice: formData.get("costPrice"),
     isSeasonal: formData.get("isSeasonal") === "on",
+    weightValue: formData.get("weightValue") || undefined,
+    weightUnit: formData.get("weightUnit") || undefined,
+    flavor: formData.get("flavor") || undefined,
+    isEggless: formData.get("isEggless") === "on",
     variants: JSON.parse((formData.get("variants") as string) || "[]"),
   };
 
@@ -90,6 +98,10 @@ export async function updateMenuItem(
     categoryId: formData.get("categoryId"),
     costPrice: formData.get("costPrice"),
     isSeasonal: formData.get("isSeasonal") === "on",
+    weightValue: formData.get("weightValue") || undefined,
+    weightUnit: formData.get("weightUnit") || undefined,
+    flavor: formData.get("flavor") || undefined,
+    isEggless: formData.get("isEggless") === "on",
     variants: JSON.parse((formData.get("variants") as string) || "[]"),
   };
 

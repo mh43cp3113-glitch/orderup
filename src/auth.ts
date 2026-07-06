@@ -40,6 +40,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           clientId: user.clientId,
           clientName: user.client?.name ?? null,
           clientLogoUrl: user.client?.logoUrl ?? null,
+          clientBusinessType: user.client?.businessType ?? null,
         };
       },
     }),

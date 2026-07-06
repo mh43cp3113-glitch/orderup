@@ -20,6 +20,13 @@ export async function createOrder(formData: FormData) {
   const customerPhone = (formData.get("customerPhone") as string)?.trim();
   const customerName = (formData.get("customerName") as string)?.trim();
 
+  const checkInDateRaw = (formData.get("checkInDate") as string) || "";
+  const checkOutDateRaw = (formData.get("checkOutDate") as string) || "";
+  const guestCountRaw = (formData.get("guestCount") as string) || "";
+  const checkInDate = checkInDateRaw ? new Date(checkInDateRaw) : null;
+  const checkOutDate = checkOutDateRaw ? new Date(checkOutDateRaw) : null;
+  const guestCount = guestCountRaw ? Number(guestCountRaw) : null;
+
   let customerId: string | undefined;
   if (customerPhone) {
     const customer = await prisma.customer.upsert({
@@ -43,6 +50,9 @@ export async function createOrder(formData: FormData) {
       tableId: type === "DINE_IN" ? tableId : null,
       customerId,
       waiterId: user.id,
+      checkInDate: type === "DINE_IN" ? checkInDate : null,
+      checkOutDate: type === "DINE_IN" ? checkOutDate : null,
+      guestCount: type === "DINE_IN" ? guestCount : null,
     },
   });
 

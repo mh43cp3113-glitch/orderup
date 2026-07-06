@@ -23,7 +23,7 @@ export async function recordPayment(
 
   const order = await prisma.order.findFirst({
     where: { id: orderId, clientId },
-    include: { bill: true, items: true },
+    include: { bill: true, items: true, client: { select: { gstEnabled: true } } },
   });
   if (!order) return "Order not found";
 
@@ -61,7 +61,7 @@ export async function recordPayment(
         clientId,
         orderId,
         subtotal,
-        taxRate: DEFAULT_TAX_RATE,
+        taxRate: order.client.gstEnabled ? DEFAULT_TAX_RATE : 0,
         taxAmount,
         discountAmount,
         couponCode,

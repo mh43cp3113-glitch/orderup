@@ -1,4 +1,4 @@
-import type { Role } from "@/generated/prisma/enums";
+import type { Role, BusinessType } from "@/generated/prisma/enums";
 
 declare module "next-auth" {
   interface Session {
@@ -9,6 +9,7 @@ declare module "next-auth" {
       clientId: string | null;
       clientName: string | null;
       clientLogoUrl: string | null;
+      clientBusinessType: BusinessType | null;
       name?: string | null;
       email?: string | null;
       image?: string | null;
@@ -21,6 +22,7 @@ declare module "next-auth" {
     clientId: string | null;
     clientName: string | null;
     clientLogoUrl: string | null;
+    clientBusinessType: BusinessType | null;
   }
 }
 
@@ -32,5 +34,6 @@ declare module "next-auth/jwt" {
     clientId: string | null;
     clientName: string | null;
     clientLogoUrl: string | null;
+    clientBusinessType: BusinessType | null;
   }
 }

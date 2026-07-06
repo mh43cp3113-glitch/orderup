@@ -12,14 +12,16 @@ import {
 } from "@/components/ui/sheet";
 import { NavSidebar } from "@/components/nav-sidebar";
 import { ClientBranding } from "@/components/client-branding";
-import type { Role } from "@/generated/prisma/enums";
+import type { Role, BusinessType } from "@/generated/prisma/enums";
 
 export function MobileNav({
   role,
+  businessType,
   clientName,
   clientLogoUrl,
 }: {
   role: Role;
+  businessType: BusinessType;
   clientName: string;
   clientLogoUrl: string | null;
 }) {
@@ -38,7 +40,7 @@ export function MobileNav({
           <SheetTitle className="sr-only">Navigation menu</SheetTitle>
           <ClientBranding name={clientName} logoUrl={clientLogoUrl} />
         </SheetHeader>
-        <NavSidebar role={role} onNavigate={() => setOpen(false)} />
+        <NavSidebar role={role} businessType={businessType} onNavigate={() => setOpen(false)} />
       </SheetContent>
     </Sheet>
   );
