@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { createClient } from "../actions";
 import { BUSINESS_TYPE_ITEMS } from "../business-type-items";
+import { BILLING_CYCLE_ITEMS } from "../billing-cycle-items";
 
 export function NewClientForm() {
   const [error, setError] = useState<string>();
@@ -46,6 +47,22 @@ export function NewClientForm() {
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(BUSINESS_TYPE_ITEMS).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="billingCycle">Billing plan</Label>
+            <Select name="billingCycle" defaultValue="MONTHLY" items={BILLING_CYCLE_ITEMS}>
+              <SelectTrigger id="billingCycle">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(BILLING_CYCLE_ITEMS).map(([value, label]) => (
                   <SelectItem key={value} value={value}>
                     {label}
                   </SelectItem>

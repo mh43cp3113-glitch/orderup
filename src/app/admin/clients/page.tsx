@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { BUSINESS_TYPE_ITEMS } from "./business-type-items";
+import { BILLING_CYCLE_ITEMS } from "./billing-cycle-items";
 
 export default async function ClientsPage() {
   const clients = await prisma.client.findMany({
@@ -40,6 +41,7 @@ export default async function ClientsPage() {
               <TableRow>
                 <TableHead>Business</TableHead>
                 <TableHead>Type</TableHead>
+                <TableHead>Plan</TableHead>
                 <TableHead>Users</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Created</TableHead>
@@ -67,6 +69,9 @@ export default async function ClientsPage() {
                     </Link>
                   </TableCell>
                   <TableCell>{BUSINESS_TYPE_ITEMS[client.businessType]}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{BILLING_CYCLE_ITEMS[client.billingCycle]}</Badge>
+                  </TableCell>
                   <TableCell>{client._count.users}</TableCell>
                   <TableCell>
                     <Badge variant={client.isActive ? "secondary" : "destructive"}>
@@ -82,7 +87,7 @@ export default async function ClientsPage() {
               ))}
               {clients.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                     No businesses onboarded yet.
                   </TableCell>
                 </TableRow>

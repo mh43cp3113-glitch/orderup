@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { requireSuperAdmin } from "@/lib/rbac";
 import { saveLogoFile } from "@/lib/logo-upload";
 import { slugify } from "@/lib/slug";
-import type { BusinessType } from "@/generated/prisma/enums";
+import type { BusinessType, BillingCycle } from "@/generated/prisma/enums";
 
 const createClientSchema = z.object({
   name: z.string().min(1, "Business name is required"),
@@ -19,7 +19,10 @@ const createClientSchema = z.object({
     "CLOUD_KITCHEN",
     "BAR_PUB",
     "FOOD_TRUCK",
+    "RESORT",
+    "FARMHOUSE",
   ]),
+  billingCycle: z.enum(["MONTHLY", "YEARLY"]).default("MONTHLY"),
   adminName: z.string().min(1, "Admin name is required"),
   adminEmail: z.string().email("Enter a valid email"),
   adminPassword: z.string().min(8, "Password must be at least 8 characters"),
@@ -42,6 +45,7 @@ export async function createClient(_prev: string | undefined, formData: FormData
   const parsed = createClientSchema.safeParse({
     name: formData.get("name"),
     businessType: formData.get("businessType"),
+    billingCycle: formData.get("billingCycle") || undefined,
     adminName: formData.get("adminName"),
     adminEmail: formData.get("adminEmail"),
     adminPassword: formData.get("adminPassword"),
@@ -51,7 +55,7 @@ export async function createClient(_prev: string | undefined, formData: FormData
     return parsed.error.issues[0]?.message ?? "Invalid input";
   }
 
-  const { name, businessType, adminName, adminEmail, adminPassword } = parsed.data;
+  const { name, businessType, billingCycle, adminName, adminEmail, adminPassword } = parsed.data;
 
   const existingUser = await prisma.user.findUnique({ where: { email: adminEmail } });
   if (existingUser) return `A user with email ${adminEmail} already exists`;
@@ -75,6 +79,7 @@ export async function createClient(_prev: string | undefined, formData: FormData
       name,
       slug,
       businessType: businessType as BusinessType,
+      billingCycle: billingCycle as BillingCycle,
       logoUrl,
       users: {
         create: {
@@ -103,7 +108,10 @@ export async function updateClient(clientId: string, formData: FormData) {
 
   const name = (formData.get("name") as string)?.trim();
   const businessType = formData.get("businessType") as BusinessType;
-  if (!name || !businessType) return "Name and business type are required";
+  const billingCycle = formData.get("billingCycle") as BillingCycle;
+  if (!name || !businessType || !billingCycle) {
+    return "Name, business type and billing plan are required";
+  }
 
   const client = await prisma.client.findUniqueOrThrow({ where: { id: clientId } });
 
@@ -119,7 +127,7 @@ export async function updateClient(clientId: string, formData: FormData) {
 
   await prisma.client.update({
     where: { id: clientId },
-    data: { name, businessType, logoUrl },
+    data: { name, businessType, billingCycle, logoUrl },
   });
 
   revalidatePath("/admin/clients");

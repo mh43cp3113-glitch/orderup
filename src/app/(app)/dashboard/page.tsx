@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/format";
 import { StatTile } from "./stat-tile";
 import { RevenueChart } from "./revenue-chart";
+import { DownloadExcelButton } from "./download-excel-button";
 import {
   IndianRupee,
   ClipboardList,
@@ -111,9 +112,12 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Live overview of today&apos;s operations.</p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Live overview of today&apos;s operations.</p>
+        </div>
+        <DownloadExcelButton />
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">

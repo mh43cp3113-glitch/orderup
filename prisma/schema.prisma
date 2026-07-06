@@ -18,6 +18,13 @@ enum BusinessType {
   CLOUD_KITCHEN
   BAR_PUB
   FOOD_TRUCK
+  RESORT
+  FARMHOUSE
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
 }
 
 enum Role {
@@ -118,6 +125,7 @@ model Client {
   name         String
   slug         String       @unique
   businessType BusinessType
+  billingCycle BillingCycle @default(MONTHLY)
   logoUrl      String?
   isActive     Boolean      @default(true)
   createdAt    DateTime     @default(now())

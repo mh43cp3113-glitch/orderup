@@ -5,4 +5,6 @@ export const BUSINESS_TYPE_ITEMS = {
   CLOUD_KITCHEN: "Cloud Kitchen",
   BAR_PUB: "Bar / Pub",
   FOOD_TRUCK: "Food Truck",
+  RESORT: "Resort",
+  FARMHOUSE: "Farmhouse Booking",
 };

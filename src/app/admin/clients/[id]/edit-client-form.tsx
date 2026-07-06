@@ -13,16 +13,19 @@ import {
 } from "@/components/ui/select";
 import { updateClient } from "../actions";
 import { BUSINESS_TYPE_ITEMS } from "../business-type-items";
-import type { BusinessType } from "@/generated/prisma/enums";
+import { BILLING_CYCLE_ITEMS } from "../billing-cycle-items";
+import type { BusinessType, BillingCycle } from "@/generated/prisma/enums";
 
 export function EditClientForm({
   clientId,
   name,
   businessType,
+  billingCycle,
 }: {
   clientId: string;
   name: string;
   businessType: BusinessType;
+  billingCycle: BillingCycle;
 }) {
   const [error, setError] = useState<string>();
   const [isPending, startTransition] = useTransition();
@@ -48,6 +51,21 @@ export function EditClientForm({
           </SelectTrigger>
           <SelectContent>
             {Object.entries(BUSINESS_TYPE_ITEMS).map(([value, label]) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="billingCycle">Billing plan</Label>
+        <Select name="billingCycle" defaultValue={billingCycle} items={BILLING_CYCLE_ITEMS}>
+          <SelectTrigger id="billingCycle">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(BILLING_CYCLE_ITEMS).map(([value, label]) => (
               <SelectItem key={value} value={value}>
                 {label}
               </SelectItem>
